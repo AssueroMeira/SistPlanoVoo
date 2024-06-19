@@ -2,8 +2,6 @@ import { Piloto } from "./ClassePiloto.js";
 import { validate } from "bycontract";
 import nReadlines from "n-readlines";
 
-// Implementação da classe ServicoPilotos
-// Esta classe criará um Array dos dados do arquivo .csv.
 export class ServicoPilotos {
     #pilotos;
 
@@ -13,17 +11,14 @@ export class ServicoPilotos {
         this.recupera(narq);
     }
 
-    // método para recuperar os dados do arquivo
     recupera(narq) {
         validate(narq, "string");
         let arq = new nReadlines(narq);
         let buf;
         let dados;
 
-        // Pula a primeira linha
         arq.next();
 
-        // Enquanto houverem linhas (leitura síncrona)
         while (buf = arq.next()) {
             let line = buf.toString('utf8');
             dados = line.split(",");
@@ -39,14 +34,16 @@ export class ServicoPilotos {
         }
     }
 
-    // Método para retornar os dados do arquivo.
     todos() {
         return this.#pilotos;
     }
 
-    // Método para buscar piloto por matrícula.
     buscaPorMatricula(matricula) {
         validate(matricula, "string");
-        return this.#pilotos.find(piloto => piloto.matricula === matricula);
+        const piloto = this.#pilotos.find(piloto => piloto.matricula === matricula.toUpperCase());
+        if (!piloto) {
+            throw new Error(`Matrícula não encontrada: ${matricula}`);
+        }
+        return piloto;
     }
 }

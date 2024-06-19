@@ -1,5 +1,2 @@
-id,matriculaPiloto,prefixoAeronave,idAerovia,data,horarioPartida,horarioChegada,altitude,slots,cancelado
-1,3036,RX-100,A21,2024-07-16,10:00,12:15,26000,10;11;12;13,false
-3,9998,RX-103,A21,2024-07-16,11:00,14:00,26000,11;12;13;14,false
-3,9998,RX-103,A21,2024-07-16,11:00,14:00,26000,11;12;13;14,false
-4,9998,RX-100,A21,2024-07-16,11:00,14:00,26000,11;12;13;14,false
+id,matriculaPiloto,prefixoAeronave,idAerovia,data,horarioPartida,altitude,slots,cancelado
+1,3036,RX-100,A21,2024-07-16,10:00,26000,10;11;12;13,false

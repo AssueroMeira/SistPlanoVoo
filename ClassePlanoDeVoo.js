@@ -4,23 +4,26 @@ export class PlanoDeVoo {
     #id;
     #matriculaPiloto;
     #prefixoAeronave;
-    #idAerovia;
+    #origem;
+    #destino;
     #data;
     #horarioPartida;
-    #horarioChegada;
     #altitude;
     #slots;
     #cancelado;
 
-    constructor(id, matriculaPiloto, prefixoAeronave, idAerovia, data, horarioPartida, horarioChegada, altitude, slots, cancelado) {
+    constructor(id, matriculaPiloto, prefixoAeronave, origem, destino, data, horarioPartida, altitude, slots, cancelado) {
         validate(arguments, ["number", "string", "string", "string", "string", "string", "string", "number", "array", "boolean"]);
         this.#id = id;
-        this.#matriculaPiloto = matriculaPiloto;
-        this.#prefixoAeronave = prefixoAeronave;
-        this.#idAerovia = idAerovia;
+        this.#matriculaPiloto = matriculaPiloto.trim().toUpperCase();
+        this.#prefixoAeronave = prefixoAeronave.trim().toUpperCase();
+        this.#origem = origem.trim().toUpperCase();
+        this.#destino = destino.trim().toUpperCase();
         this.#data = data;
         this.#horarioPartida = horarioPartida;
-        this.#horarioChegada = horarioChegada;
+        if (isNaN(altitude) || altitude <= 0) {
+            throw new Error(`Altitude inválida: ${altitude}.`);
+        }
         this.#altitude = altitude;
         this.#slots = slots;
         this.#cancelado = cancelado;
@@ -38,8 +41,12 @@ export class PlanoDeVoo {
         return this.#prefixoAeronave;
     }
 
-    get idAerovia() {
-        return this.#idAerovia;
+    get origem() {
+        return this.#origem;
+    }
+
+    get destino() {
+        return this.#destino;
     }
 
     get data() {
@@ -48,10 +55,6 @@ export class PlanoDeVoo {
 
     get horarioPartida() {
         return this.#horarioPartida;
-    }
-
-    get horarioChegada() {
-        return this.#horarioChegada;
     }
 
     get altitude() {
@@ -70,24 +73,7 @@ export class PlanoDeVoo {
         this.#cancelado = value;
     }
 
-    verificarRestricoes(outrosPlanos) {
-        for (let plano of outrosPlanos) {
-            if (plano.cancelado === false && plano.idAerovia === this.#idAerovia && plano.data === this.#data) {
-                for (let slot of this.#slots) {
-                    if (plano.slots.includes(slot) && plano.altitude === this.#altitude) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
-    }
-
     toString() {
-        return `PlanoDeVoo [id=${this.id}, matriculaPiloto=${this.matriculaPiloto}, prefixoAeronave=${this.prefixoAeronave}, idAerovia=${this.idAerovia}, data=${this.data}, horarioPartida=${this.horarioPartida}, horarioChegada=${this.horarioChegada}, altitude=${this.altitude}, slots=${this.slots.join(';')}, cancelado=${this.cancelado}]`;
+        return `PlanoDeVoo [id=${this.id}, matriculaPiloto=${this.matriculaPiloto}, prefixoAeronave=${this.prefixoAeronave}, origem=${this.origem}, destino=${this.destino}, data=${this.data}, horarioPartida=${this.horarioPartida}, altitude=${this.altitude}, slots=${this.slots.join(';')}, cancelado=${this.cancelado}]`;
     }
 }
-
-
-
-

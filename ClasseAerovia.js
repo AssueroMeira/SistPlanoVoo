@@ -1,23 +1,23 @@
 import { validate } from "bycontract";
 
-// Implementando a classe Aerovia, conforme diagrama de classes.
+// Classe Aerovia conforme especificações
 export class Aerovia {
     #id;
+    #rota;
     #origem;
     #destino;
     #tamanho;
     #altitude;
     #codAerovia;
 
-    // Implementando limites de altitudes.
+    // Limites de altitude
     static altitudeMin = 25000;
     static altitudeMax = 35000;
 
-    // Considera-se que os dados serão captados em um arquivo externo.
-    // Construtor padroniza os dados.
-    constructor(id, origem, destino, tamanho, altitude, codAerovia) {
-        validate(arguments, ["string", "string", "string", "number", "number", "string"]);
+    constructor(id, rota, origem, destino, tamanho, altitude) {
+        validate(arguments, ["string", "string", "string", "string", "number", "number"]);
         this.#id = id.trim().toUpperCase();
+        this.#rota = rota.trim().toUpperCase();
         this.#origem = origem.trim().toUpperCase();
         this.#destino = destino.trim().toUpperCase();
         if (isNaN(tamanho) || tamanho <= 0) {
@@ -28,11 +28,15 @@ export class Aerovia {
             throw new Error(`${altitude} pés está fora dos limites permitidos. As aerovias devem ter altitudes entre 25000 e 35000 pés.`);
         }
         this.#altitude = altitude;
-        this.#codAerovia = codAerovia.trim().toUpperCase();
+        this.#rota = rota.trim().toUpperCase();
     }
 
     get id() {
         return this.#id;
+    }
+
+    get rota() {
+        return this.#rota;
     }
 
     get origem() {
@@ -56,6 +60,6 @@ export class Aerovia {
     }
 
     toString() {
-        return `Id: ${this.id}. Origem: ${this.origem}. Destino: ${this.destino}. Tamanho: ${this.tamanho}. Altitude: ${this.altitude}. Código Aerovia: ${this.codAerovia}`;
+        return `Id: ${this.id}. Rota: ${this.rota}. Origem: ${this.origem}. Destino: ${this.destino}. Tamanho: ${this.tamanho}. Altitude: ${this.altitude}.`;
     }
 }

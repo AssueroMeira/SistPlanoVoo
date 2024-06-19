@@ -1,9 +1,7 @@
-// Este módulo deverá ser testado com a execução do módulo AppExUso.js
-import { Aeronave, AeronaveParticular, AeronaveComercial, AeronavePassageiros, AeronaveCarga } from "./ClasseAeronave.js";
 import { validate } from "bycontract";
+import { AeronaveParticular, AeronavePassageiros, AeronaveCarga } from "./ClasseAeronave.js";
 import nReadlines from "n-readlines";
 
-// Implementando a classe ServicoAeronaves
 export class ServicoAeronaves {
     #aeronaves;
 
@@ -13,39 +11,57 @@ export class ServicoAeronaves {
         this.recupera(narq);
     }
 
-    // Cria um Array a partir do arquivo .csv.
     recupera(narq) {
         validate(narq, "string");
         let arq = new nReadlines(narq);
         let buf;
         let dados;
 
-        // Pula a primeira linha
-        arq.next();
+        arq.next(); // Ignorar cabeçalho
 
-        // Enquanto houverem linhas (leitura síncrona)
         while (buf = arq.next()) {
             let line = buf.toString('utf8');
             dados = line.split(",");
             if (dados.length >= 5) {
                 switch (dados[1].trim()) {
-                    case 'Particular':
-                        if (dados.length >= 5) {
-                            this.#aeronaves.push(new AeronaveParticular(dados[0], parseInt(dados[2]), parseInt(dados[3]), dados[4]));
+                    case 'PARTICULAR':
+                        if (dados.length >= 6) {
+                            this.#aeronaves.push(new AeronaveParticular(
+                                dados[0].trim(),
+                                dados[1].trim(),
+                                parseInt(dados[2].trim()),
+                                parseInt(dados[3].trim()),
+                                dados[4].trim(),
+                                dados[5].trim()
+                            ));
                         } else {
                             console.error("Formato de linha inválido para Aeronave Particular em aeronaves.csv:", line);
                         }
                         break;
-                    case 'Comercial Passageiros':
+                    case 'COMERCIAL PASSAGEIROS':
                         if (dados.length >= 7) {
-                            this.#aeronaves.push(new AeronavePassageiros(dados[0], parseInt(dados[2]), parseInt(dados[3]), dados[5], parseInt(dados[6])));
+                            this.#aeronaves.push(new AeronavePassageiros(
+                                dados[0].trim(),
+                                dados[1].trim(),
+                                parseInt(dados[2].trim()),
+                                parseInt(dados[3].trim()),
+                                dados[5].trim(),
+                                parseInt(dados[6].trim())
+                            ));
                         } else {
                             console.error("Formato de linha inválido para Aeronave Comercial Passageiros em aeronaves.csv:", line);
                         }
                         break;
-                    case 'Comercial Carga':
+                    case 'COMERCIAL CARGA':
                         if (dados.length >= 8) {
-                            this.#aeronaves.push(new AeronaveCarga(dados[0], parseInt(dados[2]), parseInt(dados[3]), dados[5], parseInt(dados[7])));
+                            this.#aeronaves.push(new AeronaveCarga(
+                                dados[0].trim(),
+                                dados[1].trim(),
+                                parseInt(dados[2].trim()),
+                                parseInt(dados[3].trim()),
+                                dados[5].trim(),
+                                parseInt(dados[7].trim())
+                            ));
                         } else {
                             console.error("Formato de linha inválido para Aeronave Comercial Carga em aeronaves.csv:", line);
                         }
@@ -59,9 +75,12 @@ export class ServicoAeronaves {
         }
     }
 
-    // Retorna os dados do Array.
     todos() {
         return this.#aeronaves;
     }
-}
 
+    buscaPorPrefixo(prefixo) {
+        validate(prefixo, "string");
+        return this.#aeronaves.find(aeronave => aeronave.prefixo === prefixo.toUpperCase());
+    }
+}

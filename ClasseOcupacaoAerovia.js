@@ -1,52 +1,52 @@
-import { DateTime } from "luxon";
+import { DateTime } from 'luxon';
+import nReadlines from 'n-readlines';
 
 export class OcupacaoAerovia {
     constructor() {
         this.ocupacoes = new Map();
     }
 
-    // Método para verificar se a altitude está livre em uma data e horário
-    altitudesLivres(idAerovia, data, horarioInicio, horarioFim) {
-        const altitudes = [];
-        for (let altitude = 25000; altitude <= 35000; altitude += 1000) {
-            if (!this.isOcupado(idAerovia, data, altitude, horarioInicio, horarioFim)) {
-                altitudes.push(altitude);
+    altitudesLivres(idAerovia, data) {
+        this.carregarOcupacoes(idAerovia, data);
+        return this.obterAltitudesLivres(idAerovia);
+    }
+
+    carregarOcupacoes(idAerovia, data) {
+        let arq = new nReadlines("planos.csv");
+        let buf;
+        let dados;
+
+        arq.next(); // Ignorar cabeçalho
+
+        while (buf = arq.next()) {
+            let line = buf.toString('utf8');
+            dados = line.split(",");
+            if (dados[3] === idAerovia && dados[4] === data && dados[8] === 'false') { // Plano não cancelado
+                this.ocupacoes.set(idAerovia, true);
             }
         }
-        return altitudes;
     }
 
-    // Método para ocupar uma altitude em uma data e horário
-    ocupa(idAerovia, data, altitude, slots) {
-        slots.forEach(slot => {
-            const chave = `${idAerovia}-${data}-${slot}`;
-            if (!this.ocupacoes.has(chave)) {
-                this.ocupacoes.set(chave, new Set());
+    obterAltitudesLivres(idAerovia) {
+        let arq = new nReadlines("aerovias.csv");
+        let buf;
+        let dados;
+        let altitudesLivres = [];
+
+        arq.next(); // Ignorar cabeçalho
+
+        while (buf = arq.next()) {
+            let line = buf.toString('utf8');
+            dados = line.split(",");
+            if (this.ocupacoes.has(dados[0])) {
+                this.ocupacoes.set(idAerovia, dados[1]);                
             }
-            this.ocupacoes.get(chave).add(altitude);
-        });
-    }
-
-    // Método para verificar se uma altitude está ocupada em uma data e horário
-    isOcupado(idAerovia, data, altitude, horarioInicio, horarioFim) {
-        const horarioInicial = DateTime.fromISO(horarioInicio);
-        const horarioFinal = DateTime.fromISO(horarioFim);
-
-        for (let i = 0; i <= horarioFinal.diff(horarioInicial, 'hours').hours; i++) {
-            const slot = horarioInicial.plus({ hours: i }).toFormat('HH');
-            const chave = `${idAerovia}-${data}-${slot}`;
-            if (this.ocupacoes.has(chave) && this.ocupacoes.get(chave).has(altitude)) {
-                return true;
+            
+            if (!this.ocupacoes.get(idAerovia).has(dados[0]) && this.ocupacoes.get(dados)) {
+                altitudesLivres.push(parseInt(dados[5]));
             }
         }
-        return false;
-    }
 
-    // Método para verificar a disponibilidade de slots de horário
-    verificaDisponibilidade(idAerovia, data, altitude, slots) {
-        return slots.every(slot => {
-            const chave = `${idAerovia}-${data}-${slot}`;
-            return !(this.ocupacoes.has(chave) && this.ocupacoes.get(chave).has(altitude));
-        });
+        return altitudesLivres;
     }
 }

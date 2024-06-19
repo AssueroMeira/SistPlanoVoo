@@ -1,13 +1,10 @@
 import { validate } from "bycontract";
 
-// Todas as classes e subclasses foram implementadas para serem importadas por outros módulos.
-// Implementando a classe Piloto, conforme diagrama de classes.
 export class Piloto {
     #matricula;
     #nome;
     #habilitacaoAtiva;
-    // Considera-se que os dados serão captados em um arquivo externo.
-    // Construtor padroniza os dados.
+
     constructor(matricula, nome, habilitacaoAtiva) {
         validate(arguments, ["string", "string", "string"]);
         this.#matricula = matricula.trim().toUpperCase();

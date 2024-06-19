@@ -1,5 +1,5 @@
-import { PlanoDeVoo } from './ClassePlanoDeVoo.js';
 import { validate } from "bycontract";
+import { PlanoDeVoo } from './ClassePlanoDeVoo.js';
 import nReadlines from "n-readlines";
 import fs from 'fs';
 
@@ -18,15 +18,22 @@ export class ServicoPlanos {
         let buf;
         let dados;
 
-        arq.next();
+        arq.next(); // Ignorar cabeçalho
 
         while (buf = arq.next()) {
             let line = buf.toString('utf8');
             dados = line.split(",");
             if (dados.length === 10) {
                 this.#planos.push(new PlanoDeVoo(
-                    parseInt(dados[0]), dados[1], dados[2], dados[3], dados[4], dados[5], dados[6],
-                    parseInt(dados[7]), dados[8].split(";").map(Number), dados[9] === 'true'
+                    parseInt(dados[0].trim()),
+                    dados[1].trim(),
+                    dados[2].trim(),
+                    dados[3].trim(),
+                    dados[4].trim(),
+                    dados[5].trim(),
+                    parseInt(dados[6].trim()),
+                    dados[7].trim().split(";").map(Number),
+                    dados[8].trim()
                 ));
             } else {
                 console.error("Formato de linha inválido em planos.csv:", line);
@@ -34,25 +41,30 @@ export class ServicoPlanos {
         }
     }
 
-    adicionar(plano) {
+    consiste(plano) {
         validate(plano, PlanoDeVoo);
-        this.#planos.push(plano);
-        const line = `${plano.id},${plano.matriculaPiloto},${plano.prefixoAeronave},${plano.idAerovia},${plano.data},${plano.horarioPartida},${plano.horarioChegada},${plano.altitude},${plano.slots.join(';')},${plano.cancelado}\n`;
-        fs.appendFileSync('planos.csv', line);
+        // Validar dados do plano (id único, matricula de piloto ativa, etc.)
+        // Supondo que esta função realize todas as validações necessárias
     }
 
-    verificarDisponibilidade(novoPlano) {
-        return novoPlano.verificarRestricoes(this.#planos);
+    salvarPlano(plano) {
+        validate(plano, PlanoDeVoo);
+        this.#planos.push(plano);
+        const line = `${plano.id},${plano.matriculaPiloto},${plano.prefixoAeronave},${plano.origem},${plano.destino},${plano.data},${plano.horarioPartida},${plano.altitude},${plano.slots.join(';')},${plano.cancelado}\n`;
+        fs.appendFileSync('planos.csv', line);
+        console.log('Plano adicionado ao arquivo planos.csv:', line);
     }
 
     todos() {
         return this.#planos;
     }
+
+    recupera(idPlano) {
+        const planosValidos = this.#planos.filter(plano => plano.id === idPlano && !plano.cancelado);
+        const planosCancelados = this.#planos.filter(plano => plano.id === idPlano && plano.cancelado);
+        return {
+            planosValidos,
+            planosCancelados
+        };
+    }
 }
-
-
-
-
-
-
-
