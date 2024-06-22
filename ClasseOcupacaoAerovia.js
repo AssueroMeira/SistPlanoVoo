@@ -1,52 +1,156 @@
-import { DateTime } from 'luxon';
-import nReadlines from 'n-readlines';
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+import { DateTime } from "luxon";
 
-export class OcupacaoAerovia {
-    constructor() {
-        this.ocupacoes = new Map();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+class OcupacaoAerovia {
+    constructor(arquivoOcupacao) {
+        this.arquivoOcupacao = arquivoOcupacao;
+        this.ocupacoes = this.carregarOcupacoes();
     }
 
-    altitudesLivres(idAerovia, data) {
-        this.carregarOcupacoes(idAerovia, data);
-        return this.obterAltitudesLivres(idAerovia);
-    }
-
-    carregarOcupacoes(idAerovia, data) {
-        let arq = new nReadlines("planos.csv");
-        let buf;
-        let dados;
-
-        arq.next(); // Ignorar cabeçalho
-
-        while (buf = arq.next()) {
-            let line = buf.toString('utf8');
-            dados = line.split(",");
-            if (dados[3] === idAerovia && dados[4] === data && dados[8] === 'false') { // Plano não cancelado
-                this.ocupacoes.set(idAerovia, true);
+    carregarOcupacoes() {
+        const ocupacoes = [];
+        const dados = fs.readFileSync(
+            path.resolve(__dirname, this.arquivoOcupacao),
+            "utf8",
+        );
+        const linhas = dados.trim().split("\n");
+        linhas.forEach((linha, index) => {
+            if (index > 0) {
+                const [id, rota, data, altitude, slotsOcupados] =
+                    linha.split(",");
+                ocupacoes.push({
+                    id,
+                    rota,
+                    data,
+                    altitude: parseInt(altitude),
+                    slotsOcupados: slotsOcupados
+                        .split(";")
+                        .map((slot) => parseInt(slot)),
+                });
             }
+        });
+        return ocupacoes;
+    }
+
+    isOcupado(origem, destino, prefixo, hora, data, altitude) {
+        const rota = `${origem}-${destino}`;
+        const slots = this.calculaSlots(prefixo, hora);
+        const dataComparacao = DateTime.fromFormat(
+            data,
+            "dd-MM-yyyy",
+        ).toISODate();
+
+        for (const ocupacao of this.ocupacoes) {
+            const dataOcupacao = DateTime.fromFormat(
+                ocupacao.data,
+                "dd-MM-yyyy",
+            ).toISODate();
+            if (
+                ocupacao.rota === rota &&
+                dataOcupacao === dataComparacao &&
+                ocupacao.altitude === altitude
+            ) {
+                const slotsOcupados = ocupacao.slotsOcupados;
+                if (slots.some((slot) => slotsOcupados.includes(slot))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    ocupa(origem, destino, prefixo, data, hora, altitude) {
+        const rota = `${origem}-${destino}`;
+        const slots = this.calculaSlots(prefixo, hora);
+
+        const aeroviasDados = fs.readFileSync(
+            path.resolve(__dirname, "aerovias.csv"),
+            "utf8",
+        );
+        const linhasAerovias = aeroviasDados.trim().split("\n");
+        let id = null;
+
+        for (const linha of linhasAerovias) {
+            const [aeroviaId, aeroviaRota, , , , aeroviaAltitude] =
+                linha.split(",");
+            if (
+                aeroviaRota === rota &&
+                parseInt(aeroviaAltitude) === altitude
+            ) {
+                id = aeroviaId;
+                break;
+            }
+        }
+
+        if (id !== null) {
+            const novaOcupacao = {
+                id,
+                rota,
+                data,
+                altitude,
+                slotsOcupados: slots,
+            };
+            this.ocupacoes.push(novaOcupacao);
+
+            const linhaOcupacao = `${id},${rota},${data},${altitude},${slots.join(";")}\n`;
+            fs.appendFileSync(
+                path.resolve(__dirname, this.arquivoOcupacao),
+                linhaOcupacao,
+            );
         }
     }
 
-    obterAltitudesLivres(idAerovia) {
-        let arq = new nReadlines("aerovias.csv");
-        let buf;
-        let dados;
-        let altitudesLivres = [];
+    calculaSlots(prefixo, horarioInicio) {
+        const tempoViagem = 2; // tempo de viagem em horas, deve ser calculado corretamente
+        const minutosTotais = tempoViagem * 60;
+        const horarioInicial = DateTime.fromFormat(horarioInicio, "HH:mm");
+        const slots = [];
 
-        arq.next(); // Ignorar cabeçalho
-
-        while (buf = arq.next()) {
-            let line = buf.toString('utf8');
-            dados = line.split(",");
-            if (this.ocupacoes.has(dados[0])) {
-                this.ocupacoes.set(idAerovia, dados[1]);                
-            }
-            
-            if (!this.ocupacoes.get(idAerovia).has(dados[0]) && this.ocupacoes.get(dados)) {
-                altitudesLivres.push(parseInt(dados[5]));
-            }
+        for (let i = 0; i <= Math.ceil(minutosTotais / 60); i++) {
+            slots.push(horarioInicial.plus({ hours: i }).hour);
         }
 
+        return slots;
+    }
+
+    listarAltitudesLivres(rota, data, slots) {
+        const altitudesPossiveis = [
+            25000, 26000, 27000, 28000, 29000, 30000, 31000, 32000, 33000,
+            34000, 35000,
+        ];
+        const altitudesOcupadas = new Set();
+
+        this.ocupacoes.forEach((ocupacao) => {
+            const dataOcupacao = DateTime.fromFormat(
+                ocupacao.data,
+                "dd-MM-yyyy",
+            ).toISODate();
+            const dataComparacao = DateTime.fromFormat(
+                data,
+                "dd-MM-yyyy",
+            ).toISODate();
+
+            if (ocupacao.rota === rota && dataOcupacao === dataComparacao) {
+                const slotsOcupados = ocupacao.slotsOcupados;
+                const slotsEmComum = slots.some((slot) =>
+                    slotsOcupados.includes(slot),
+                );
+                if (slotsEmComum) {
+                    altitudesOcupadas.add(ocupacao.altitude);
+                }
+            }
+        });
+
+        const altitudesLivres = altitudesPossiveis.filter(
+            (altitude) => !altitudesOcupadas.has(altitude),
+        );
         return altitudesLivres;
     }
 }
+
+export { OcupacaoAerovia };

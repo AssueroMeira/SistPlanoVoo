@@ -1,4 +1,5 @@
 import { validate } from "bycontract";
+import { DateTime } from "luxon";
 
 export class PlanoDeVoo {
     #id;
@@ -12,15 +13,40 @@ export class PlanoDeVoo {
     #slots;
     #cancelado;
 
-    constructor(id, matriculaPiloto, prefixoAeronave, origem, destino, data, horarioPartida, altitude, slots, cancelado) {
-        validate(arguments, ["number", "string", "string", "string", "string", "string", "string", "number", "array", "boolean"]);
+    constructor(
+        id,
+        matriculaPiloto,
+        prefixoAeronave,
+        origem,
+        destino,
+        data,
+        horarioPartida,
+        altitude,
+        slots,
+        cancelado,
+    ) {
+        validate(arguments, [
+            "number",
+            "string",
+            "string",
+            "string",
+            "string",
+            "string",
+            "string",
+            "number",
+            "array",
+            "boolean",
+        ]);
         this.#id = id;
         this.#matriculaPiloto = matriculaPiloto.trim().toUpperCase();
         this.#prefixoAeronave = prefixoAeronave.trim().toUpperCase();
         this.#origem = origem.trim().toUpperCase();
         this.#destino = destino.trim().toUpperCase();
-        this.#data = data;
-        this.#horarioPartida = horarioPartida;
+        this.#data = DateTime.fromFormat(data, "dd-MM-yyyy").toISODate();
+        this.#horarioPartida = DateTime.fromFormat(
+            horarioPartida,
+            "HH:mm",
+        ).toISO();
         if (isNaN(altitude) || altitude <= 0) {
             throw new Error(`Altitude inválida: ${altitude}.`);
         }
@@ -74,6 +100,6 @@ export class PlanoDeVoo {
     }
 
     toString() {
-        return `PlanoDeVoo [id=${this.id}, matriculaPiloto=${this.matriculaPiloto}, prefixoAeronave=${this.prefixoAeronave}, origem=${this.origem}, destino=${this.destino}, data=${this.data}, horarioPartida=${this.horarioPartida}, altitude=${this.altitude}, slots=${this.slots.join(';')}, cancelado=${this.cancelado}]`;
+        return `PlanoDeVoo [id=${this.id}, matriculaPiloto=${this.matriculaPiloto}, prefixoAeronave=${this.prefixoAeronave}, origem=${this.origem}, destino=${this.destino}, data=${this.data}, horarioPartida=${this.horarioPartida}, altitude=${this.altitude}, slots=${this.slots.join(";")}, cancelado=${this.cancelado}]`;
     }
 }

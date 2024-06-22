@@ -1,4 +1,4 @@
-import { Aerovia } from './ClasseAerovia.js';
+import { Aerovia } from "./ClasseAerovia.js";
 import { validate } from "bycontract";
 import nReadlines from "n-readlines";
 
@@ -19,13 +19,25 @@ export class ServicoAerovias {
 
         arq.next();
 
-        while (buf = arq.next()) {
-            let line = buf.toString('utf8');
+        while ((buf = arq.next())) {
+            let line = buf.toString("utf8");
             dados = line.split(",");
             if (dados.length === 6) {
-                this.#aerovias.push(new Aerovia(dados[0], dados[1], dados[2], dados[3], parseFloat(dados[4]), parseInt(dados[5])));
+                this.#aerovias.push(
+                    new Aerovia(
+                        dados[0],
+                        dados[1],
+                        dados[2],
+                        dados[3],
+                        parseFloat(dados[4]),
+                        parseInt(dados[5]),
+                    ),
+                );
             } else {
-                console.error("Formato de linha inválido em aerovias.csv:", line);
+                console.error(
+                    "Formato de linha inválido em aerovias.csv:",
+                    line,
+                );
             }
         }
     }
@@ -34,3 +46,4 @@ export class ServicoAerovias {
         return this.#aerovias;
     }
 }
+

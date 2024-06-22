@@ -32,6 +32,6 @@ export class Piloto {
     }
 
     toString() {
-        return `Matrícula: ${this.matricula}. Nome: ${this.nome}. Habilitação: ${this.habilitacaoAtiva ? 'Ativo' : 'Inativo'}`;
+        return `Matrícula: ${this.matricula}. Nome: ${this.nome}. Habilitação: ${this.habilitacaoAtiva ? "Ativo" : "Inativo"}`;
     }
 }

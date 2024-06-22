@@ -1,6 +1,5 @@
 import { validate } from "bycontract";
 
-// Classe base Aeronave
 export class Aeronave {
     #prefixo;
     #tipo;
@@ -13,8 +12,13 @@ export class Aeronave {
     constructor(prefixo, tipo, velocidadeCruzeiro, autonomia) {
         validate(arguments, ["string", "string", "number", "number"]);
         this.#prefixo = prefixo.trim().toUpperCase();
-        if (velocidadeCruzeiro < Aeronave.velocidadeCruzeiroMin || velocidadeCruzeiro > Aeronave.velocidadeCruzeiroMax) {
-            throw new Error(`Velocidade inválida: ${velocidadeCruzeiro}. A velocidade indicada está fora dos limites já registrados. Por favor, verifique se há algum erro.`);
+        if (
+            velocidadeCruzeiro < Aeronave.velocidadeCruzeiroMin ||
+            velocidadeCruzeiro > Aeronave.velocidadeCruzeiroMax
+        ) {
+            throw new Error(
+                `Velocidade inválida: ${velocidadeCruzeiro}. A velocidade indicada está fora dos limites já registrados. Por favor, verifique se há algum erro.`,
+            );
         }
         this.#tipo = tipo.trim();
         this.#velocidadeCruzeiro = velocidadeCruzeiro;
@@ -45,7 +49,6 @@ export class Aeronave {
     }
 }
 
-// Classe AeronaveParticular
 export class AeronaveParticular extends Aeronave {
     #respmanutencao;
 
@@ -60,11 +63,13 @@ export class AeronaveParticular extends Aeronave {
     }
 
     toString() {
-        return super.toString() + ` Empresa responsável pela manutenção: ${this.respmanutencao}.`;
+        return (
+            super.toString() +
+            ` Empresa responsável pela manutenção: ${this.respmanutencao}.`
+        );
     }
 }
 
-// Classe AeronaveComercial
 export class AeronaveComercial extends Aeronave {
     #nomeCIA;
 
@@ -83,15 +88,30 @@ export class AeronaveComercial extends Aeronave {
     }
 }
 
-// Classe AeronavePassageiros
 export class AeronavePassageiros extends AeronaveComercial {
     #maxPassageiros;
 
-    constructor(prefixo, tipo, velocidadeCruzeiro, autonomia, nomeCIA, maxPassageiros) {
-        validate(arguments, ["string", "string", "number", "number", "string", "number"]);
+    constructor(
+        prefixo,
+        tipo,
+        velocidadeCruzeiro,
+        autonomia,
+        nomeCIA,
+        maxPassageiros,
+    ) {
+        validate(arguments, [
+            "string",
+            "string",
+            "number",
+            "number",
+            "string",
+            "number",
+        ]);
         super(prefixo, tipo, velocidadeCruzeiro, autonomia, nomeCIA);
         if (maxPassageiros <= 0) {
-            throw new Error(`Valor (capacidade máxima de passageiros) inválido: ${maxPassageiros}.`);
+            throw new Error(
+                `Valor (capacidade máxima de passageiros) inválido: ${maxPassageiros}.`,
+            );
         }
         this.#maxPassageiros = maxPassageiros;
     }
@@ -101,16 +121,32 @@ export class AeronavePassageiros extends AeronaveComercial {
     }
 
     toString() {
-        return super.toString() + ` Quantidade máxima de passageiros: ${this.maxPassageiros}.`;
+        return (
+            super.toString() +
+            ` Quantidade máxima de passageiros: ${this.maxPassageiros}.`
+        );
     }
 }
 
-// Classe AeronaveCarga
 export class AeronaveCarga extends AeronaveComercial {
     #pesoMax;
 
-    constructor(prefixo, tipo, velocidadeCruzeiro, autonomia, nomeCIA, pesoMax) {
-        validate(arguments, ["string", "string", "number", "number", "string", "number"]);
+    constructor(
+        prefixo,
+        tipo,
+        velocidadeCruzeiro,
+        autonomia,
+        nomeCIA,
+        pesoMax,
+    ) {
+        validate(arguments, [
+            "string",
+            "string",
+            "number",
+            "number",
+            "string",
+            "number",
+        ]);
         super(prefixo, tipo, velocidadeCruzeiro, autonomia, nomeCIA);
         if (pesoMax <= 0) {
             throw new Error(`Peso inválido: ${pesoMax}.`);

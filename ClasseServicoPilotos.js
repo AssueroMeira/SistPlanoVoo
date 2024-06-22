@@ -19,17 +19,25 @@ export class ServicoPilotos {
 
         arq.next();
 
-        while (buf = arq.next()) {
-            let line = buf.toString('utf8');
+        while ((buf = arq.next())) {
+            let line = buf.toString("utf8");
             dados = line.split(",");
             if (dados.length === 3) {
                 try {
-                    this.#pilotos.push(new Piloto(dados[0], dados[1], dados[2]));
+                    this.#pilotos.push(
+                        new Piloto(dados[0], dados[1], dados[2]),
+                    );
                 } catch (error) {
-                    console.error(`Erro ao criar Piloto com dados: ${line}`, error.message);
+                    console.error(
+                        `Erro ao criar Piloto com dados: ${line}`,
+                        error.message,
+                    );
                 }
             } else {
-                console.error("Formato de linha inválido em pilotos.csv:", line);
+                console.error(
+                    "Formato de linha inválido em pilotos.csv:",
+                    line,
+                );
             }
         }
     }
@@ -40,7 +48,9 @@ export class ServicoPilotos {
 
     buscaPorMatricula(matricula) {
         validate(matricula, "string");
-        const piloto = this.#pilotos.find(piloto => piloto.matricula === matricula.toUpperCase());
+        const piloto = this.#pilotos.find(
+            (piloto) => piloto.matricula === matricula.toUpperCase(),
+        );
         if (!piloto) {
             throw new Error(`Matrícula não encontrada: ${matricula}`);
         }

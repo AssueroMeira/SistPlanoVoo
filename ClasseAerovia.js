@@ -8,14 +8,20 @@ export class Aerovia {
     #destino;
     #tamanho;
     #altitude;
-    #codAerovia;
 
     // Limites de altitude
     static altitudeMin = 25000;
     static altitudeMax = 35000;
 
     constructor(id, rota, origem, destino, tamanho, altitude) {
-        validate(arguments, ["string", "string", "string", "string", "number", "number"]);
+        validate(arguments, [
+            "string",
+            "string",
+            "string",
+            "string",
+            "number",
+            "number",
+        ]);
         this.#id = id.trim().toUpperCase();
         this.#rota = rota.trim().toUpperCase();
         this.#origem = origem.trim().toUpperCase();
@@ -24,8 +30,14 @@ export class Aerovia {
             throw new Error(`Tamanho inválido: ${tamanho}.`);
         }
         this.#tamanho = tamanho;
-        if (isNaN(altitude) || altitude < Aerovia.altitudeMin || altitude > Aerovia.altitudeMax) {
-            throw new Error(`${altitude} pés está fora dos limites permitidos. As aerovias devem ter altitudes entre 25000 e 35000 pés.`);
+        if (
+            isNaN(altitude) ||
+            altitude < Aerovia.altitudeMin ||
+            altitude > Aerovia.altitudeMax
+        ) {
+            throw new Error(
+                `${altitude} pés está fora dos limites permitidos. As aerovias devem ter altitudes entre 25000 e 35000 pés.`,
+            );
         }
         this.#altitude = altitude;
         this.#rota = rota.trim().toUpperCase();
@@ -53,10 +65,6 @@ export class Aerovia {
 
     get altitude() {
         return this.#altitude;
-    }
-
-    get codAerovia() {
-        return this.#codAerovia;
     }
 
     toString() {
