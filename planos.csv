@@ -1,2 +1,2 @@
 id,matriculaPiloto,prefixoAeronave,idAerovia,data,horarioPartida,altitude,slots,cancelado
-1,3036,RX-100,A21,2024-07-16,10:00,26000,10;11;12;13,false
+1,3036,RX-100,A21,2024-07-16,10:00,26000,10;11;12;13,NAO

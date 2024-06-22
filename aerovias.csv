@@ -1,4 +1,4 @@
-﻿Id,rota,origem,destino,distância,altitude 
+Id,rota,origem,destino,tamanho,altitude 
 A1,CGH-SDU,CGH,SDU,378,25000
 A2,CGH-SDU,CGH,SDU,378,26000
 A3,CGH-SDU,CGH,SDU,378,27000
