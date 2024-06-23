@@ -106,7 +106,7 @@ class OcupacaoAerovia {
     }
 
     calculaSlots(prefixo, horarioInicio) {
-        const tempoViagem = 2; // tempo de viagem em horas, deve ser calculado corretamente
+        const tempoViagem = 2; 
         const minutosTotais = tempoViagem * 60;
         const horarioInicial = DateTime.fromFormat(horarioInicio, "HH:mm");
         const slots = [];

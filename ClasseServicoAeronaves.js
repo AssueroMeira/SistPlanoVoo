@@ -8,6 +8,7 @@ import nReadlines from "n-readlines";
 
 export class ServicoAeronaves {
     #aeronaves;
+    #recuperaChamado = false;
 
     constructor(narq = "aeronaves.csv") {
         validate(narq, "string");
@@ -16,6 +17,11 @@ export class ServicoAeronaves {
     }
 
     recupera(narq) {
+        if (this.#recuperaChamado) {
+            return;
+        }
+        this.#recuperaChamado = true;
+
         validate(narq, "string");
         let arq = new nReadlines(narq);
         let buf;
@@ -26,6 +32,7 @@ export class ServicoAeronaves {
         while ((buf = arq.next())) {
             let line = buf.toString("utf8");
             dados = line.split(",");
+
             if (dados.length >= 5) {
                 switch (dados[1].trim()) {
                     case "PARTICULAR":
@@ -37,13 +44,13 @@ export class ServicoAeronaves {
                                     parseInt(dados[2].trim()),
                                     parseInt(dados[3].trim()),
                                     dados[4].trim(),
-                                    dados[5].trim(),
-                                ),
+                                    dados[5].trim()
+                                )
                             );
                         } else {
                             console.error(
                                 "Formato de linha inválido para Aeronave Particular em aeronaves.csv:",
-                                line,
+                                line
                             );
                         }
                         break;
@@ -56,13 +63,13 @@ export class ServicoAeronaves {
                                     parseInt(dados[2].trim()),
                                     parseInt(dados[3].trim()),
                                     dados[5].trim(),
-                                    parseInt(dados[6].trim()),
-                                ),
+                                    parseInt(dados[6].trim())
+                                )
                             );
                         } else {
                             console.error(
                                 "Formato de linha inválido para Aeronave Comercial Passageiros em aeronaves.csv:",
-                                line,
+                                line
                             );
                         }
                         break;
@@ -75,27 +82,24 @@ export class ServicoAeronaves {
                                     parseInt(dados[2].trim()),
                                     parseInt(dados[3].trim()),
                                     dados[5].trim(),
-                                    parseInt(dados[7].trim()),
-                                ),
+                                    parseInt(dados[7].trim())
+                                )
                             );
                         } else {
                             console.error(
                                 "Formato de linha inválido para Aeronave Comercial Carga em aeronaves.csv:",
-                                line,
+                                line
                             );
                         }
                         break;
                     default:
                         console.error(
                             "Tipo de aeronave desconhecido em aeronaves.csv:",
-                            line,
+                            line
                         );
                 }
             } else {
-                console.error(
-                    "Formato de linha inválido em aeronaves.csv:",
-                    line,
-                );
+                console.error("Formato de linha inválido em aeronaves.csv:", line);
             }
         }
     }
@@ -107,8 +111,7 @@ export class ServicoAeronaves {
     buscaPorPrefixo(prefixo) {
         validate(prefixo, "string");
         return this.#aeronaves.find(
-            (aeronave) => aeronave.prefixo === prefixo.toUpperCase(),
+            (aeronave) => aeronave.prefixo === prefixo.toUpperCase()
         );
     }
 }
-

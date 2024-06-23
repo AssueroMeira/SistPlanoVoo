@@ -1,6 +1,6 @@
 import { Aerovia } from "./ClasseAerovia.js";
 import { validate } from "bycontract";
-import nReadlines from "n-readlines";
+import fs from 'fs';
 
 export class ServicoAerovias {
     #aerovias;
@@ -13,15 +13,12 @@ export class ServicoAerovias {
 
     recupera(narq) {
         validate(narq, "string");
-        let arq = new nReadlines(narq);
-        let buf;
-        let dados;
+        const data = fs.readFileSync(narq, 'utf8');
+        const linhas = data.split('\n');
+        linhas.shift();  // Remove o cabeçalho
 
-        arq.next();
-
-        while ((buf = arq.next())) {
-            let line = buf.toString("utf8");
-            dados = line.split(",");
+        linhas.forEach((linha) => {
+            const dados = linha.split(',');
             if (dados.length === 6) {
                 this.#aerovias.push(
                     new Aerovia(
@@ -36,14 +33,17 @@ export class ServicoAerovias {
             } else {
                 console.error(
                     "Formato de linha inválido em aerovias.csv:",
-                    line,
+                    linha,
                 );
             }
-        }
+        });
     }
 
     todos() {
         return this.#aerovias;
     }
-}
 
+    buscarPorId(id) {
+        return this.#aerovias.find(aerovia => aerovia.id === id);
+    }
+}
